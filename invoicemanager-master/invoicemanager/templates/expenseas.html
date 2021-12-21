@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if error_message %}
+<div class="alert alert-danger">{{ error_message }}</div>
+{% endif %}
+
+{% if expenseas %}
+
+<div class="panel panel-primary">
+	<div class="panel-heading">Business expenses</div>
+	<table class="table table-hover">
+		<tr>
+			<th>Description</th>
+			<th>Date</th>
+			<th>Cost</th>
+			<th>Qty</th>
+			<th>Total</th>
+			<th>Attachment(s)</th>
+			<th class="text-right">Actions</th>
+		</tr>
+		{% for expensea in expenseas %}
+		<tr>
+			<!-- ID: {{ expense.id }} -->
+			<td>{{ expensea.description }}</td>
+			<td>{{ expensea.date|date:"SHORT_DATE_FORMAT" }}</td>
+			<td>${{ expenseq.cost }}</td>
+			<td>{{ expenseq.qty }}</td>
+			<td>${{ expensea.total }}</td>
+			<td>
+				{% for attachmenta in expensea.expenseattachmenta_set.all %}
+				<a href="{{ attachmenta.file.url }}">{{ attachmenta.displayname }}</a><br>
+				{% endfor %}
+			</td>
+			<td class="text-right">
+				<a href="{% url 'upload_business_expensea_attachmenta' expensea.id %}" class="btn btn-xs btn-default">Add Attachment</a>
+				<button type="button" data-toggle="modal" data-target="#confirmdelete" data-object-name="{{ expensea.description }}" data-delete-url="{% url 'delete_business_expensea' expensea.id %}" class="btn btn-xs btn-danger">Delete</button>
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+
+<!-- Delete confirmation modal -->
+<div class="modal fade" id="confirmdelete" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Confirm</h4>
+			</div>
+			<div class="modal-body">
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+				<a href="#" class="btn btn-danger">Yes</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function() {
+		$('#confirmdelete').on('show.bs.modal', function(e) {
+			var name = $(e.relatedTarget).data('object-name');
+			var url = $(e.relatedTarget).data('delete-url');
+			$('#confirmdelete .modal-body').html("Are you sure you want to delete " + name + "?<br><i>Any associated attachments will also be deleted.</i>");
+			$('#confirmdelete .modal-footer a').attr('href', url);
+		});
+	});
+</script>
+<!-- END delete confirmation modal -->
+
+{% else %}
+
+<div class="alert alert-warning">No business expenses!</div>
+
+{% endif %}
+
+{% endblock %}

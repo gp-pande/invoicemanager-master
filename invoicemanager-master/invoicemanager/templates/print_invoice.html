@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE HTML>
+<html lang="en">
+
+<div>
+	{% if title %}
+	<title>{{ title }}</title>
+	{% else %}
+	<title>Invoice Manager</title>
+	{% endif %}
+	
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}">
+	<link rel=stylesheet" type="text/css" href="{% static 'static/bootstrap/css/style.css' %}>
+</head>
+
+<body>
+	&nbsp;<br>
+	<div class="container">
+
+	{% if error_message %}
+	<div class="alert alert-danger">{{ error_message }}</div>
+	{% endif %}
+
+	{% if invoice %}
+
+	<div class="row">
+		<div class="col-sm-2 text-left">
+
+		</div>
+		<div class="col-sm-2 text-center">
+			<h2>Invoice {{ invoice.id }}</h2>
+			{{ invoice.date }}
+		</div>
+		<div class="col-sm-8 text-right">
+			<div class="panel panel-default">
+				<div class="panel-heading">Customer number: {{ invoice.customer.id }}</div>
+				<div class="panel-body">
+					{% if invoice.customer.name %}{{ invoice.customer.name }}<br>{% endif %}
+					{% if invoice.customer.address %}{{ invoice.customer.address }}<br>{% endif %}
+					{% if invoice.customer.number %}{{ invoice.customer.number }}{% endif %}
+					{% if invoice.customer.email %}{{ invoice.customer.email }}{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+
+	<!-- Invoice items -->
+
+	<table class="table table-hover">
+		<tr>
+			<th>Item</th>
+			<th>Weight In Gm</th>
+			<th>Money Taken</th>
+			<th>Deposited Date</th>
+		</tr>
+		{% for item in invoice.invoiceitem_set.all %}
+		<tr>
+			<td>{{ item.name }}</td>
+			<td>{{ item.weight }}Gm</td>
+			<td>Rs{{ item.money }}</td>
+			<td>{{ item.ddate }}AD</td>
+		</tr>
+		{% endfor %}
+	</table>
+
+
+
+	{% endif %}
+
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+</body>
+
+</html>

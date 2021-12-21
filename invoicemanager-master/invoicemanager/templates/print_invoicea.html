@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+	{% if title %}
+	<title>{{ title }}</title>
+	{% else %}
+	<title>Invoice Manager</title>
+	{% endif %}
+	
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}">
+</head>
+
+<body>
+	&nbsp;<br>
+	<div class="container">
+
+	{% if error_message %}
+	<div class="alert alert-danger">{{ error_message }}</div>
+	{% endif %}
+
+	{% if invoicea %}
+
+	<div class="row">
+		<div class="col-sm-4 text-left">
+			Please submit payment to:<br>
+			<address>
+			<strong>Chris Thayer</strong><br>
+			7 Oak Lane<br>
+			Cranford, NJ 07016
+			</address>
+		</div>
+		<div class="col-sm-4 text-center">
+			<h2>Invoice {{ invoicea.id }}</h2>
+			{{ invoicea.date }}
+		</div>
+		<div class="col-sm-4 text-right">
+			<div class="panel panel-default">
+				<div class="panel-heading">Customer number: {{ invoicea.customera.id }}</div>
+				<div class="panel-body">
+					{% if invoicea.customera.name %}{{ invoicea.customera.name }}<br>{% endif %}
+					{% if invoicea.customera.address %}{{ invoicea.customera.address }}<br>{% endif %}
+					{% if invoicea.customera.email %}{{ invoicea.customera.email }}<br>{% endif %}
+					{% if invoicea.customera.number %}{{ invoicea.customera.city }}{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Invoice items -->
+
+	<table class="table table-hover">
+		<tr>
+			<th>Item</th>
+			<th>Description</th>
+			<th>Cost</th>
+			<th>Qty</th>
+			<th>Total</th>
+		</tr>
+		{% for item in invoice.invoiceitem_set.all %}
+		<tr>
+			<td>{{ item.name }}</td>
+			<td>{{ item.description }}</td>
+			<td>${{ item.cost }}</td>
+			<td>{{ item.qty }}</td>
+			<td>${{ item.total }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+
+	<h2 class="text-right">Invoice total: ${{ invoice.total_items }}</h2>
+
+	{% endif %}
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+</body>
+
+</html>

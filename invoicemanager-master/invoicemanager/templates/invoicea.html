@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if error_message %}
+
+<div class="alert alert-danger">{{ error_message }}</div>
+
+{% endif %}
+{% if invoicea %}
+<!-- Display invoice -->
+
+<h2 class="text-center">Record {{ invoicea.id }}</h2>
+
+<!-- Customer information -->
+
+<form method="POST" action="{% url 'update_invoicea' invoicea.id %}" name="customer" class="form-horizontal">
+	{% csrf_token %}
+	<div class="panel panel-primary">
+		<div class="panel-heading">Customer</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">Customer:</label>
+				<div class="col-sm-6">
+					<p class="form-control-static"><a href="{% url 'customera' invoicea.customera.id %}">{{ invoicea.customera }}</a></p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">Date:</label>
+				<div class="col-sm-6">
+					<input type="text" class="form-control" name="date" id="invoicedate" value="{{ invoicea.date|date:"SHORT_DATE_FORMAT" }}">
+				</div>
+				<script type="text/javascript">
+					$(function () {
+						$('#invoicedate').datepicker({
+							todayBtn: "linked",
+							orientation: "bottom left",
+							autoclose: true
+						});
+					});
+					</script>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">Status:</label>
+				<div class="col-sm-6">
+					<select name="status" class="form-control">
+						<option value="Draft" {% if invoicea.draft %}selected{% endif %}>Draft</option>
+						<option value="Paid" {% if invoicea.paid %}selected{% endif %}>Paid</option>
+						<option value="Unpaid" {% if invoicea.unpaid %}selected{% endif %}>Unpaid</option>
+					<select>
+				</div>
+			</div>
+		</div>
+		<div class="panel-footer">
+			<input type="submit" value="Save" class="btn btn-primary">
+			<a href="{% url 'print_invoicea' invoicea.id %}" target="_new" class="btn btn-default">Printable Invoice</a>
+		</div>
+	</div>
+</form>
+
+<!-- END Customer information -->
+
+<!-- Invoice items -->
+
+<form action="{% url 'add_itema' invoicea.id %}" method="post" class="form-inline">
+	{% csrf_token %}
+	<div class="panel panel-primary">
+		<div class="panel-heading"> Finance Record for Deposite</div>
+		<table class="table table-hover">
+			<tr>
+				<th>Type Name</th>
+				<th>Amount</th>
+				<th>Deposited Date</th>
+				<th>Rate</th>
+				<th class="text-right">Actions</th>
+			</tr>
+			{% for itema in invoicea.invoiceitema_set.all %}
+			<tr>
+				<td>{{ itema.name }}</td>
+				<td>{{ itema.amount }}</td>
+				<td>{{ itema.ddate }}AD</td>
+				<td>{{ itema.rate }}%</td>
+				<td class="text-right">
+					<button type="button" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#confirmdelete" data-object-name="{{ itema.description }}" data-delete-url="{% url 'delete_itema' invoicea.id itema.id %}">Delete</button>
+				</td>
+			</tr>
+			{% endfor %}
+			<tr>
+				<td><input type="text" name="name" class="form-control"></td>
+				<td>
+					<div class="input-group"><span class="input-group-addon">Rs</span><input type="text" name="amount" class="form-control" placeholder="0.00"/></div>
+				</td>
+				<td>
+					<div class="input-group"><input type="date" name="ddate" class="form-control" placeholder=""/><span class="input-group-addon">AD</span></div>
+				</td>
+				<td>
+					<div class="input-group"><input type="text" name="rate" class="form-control" placeholder="0"/><span class="input-group-addon">%</span></div>
+				</td>
+				<td class="text-right">
+					<input type="submit" class="btn btn-xs btn-primary" value="Add">
+				</td>
+			</tr>
+		</table>
+		<div class="panel-footer text-right"><strong>Total: Rs{{ invoicea.total_amount }}</strong></div>
+	</div>
+</form>
+
+<form action="{% url 'add_invoicea_expensea' invoicea.id %}" method="post" class="form-inline">
+	{% csrf_token %}
+	<div class="panel panel-primary">
+		<div class="panel-heading">Finance Record For Withdraw</div>
+		<table class="table table-hover">
+			<tr>
+				<th>Description</th>
+				<th>Withdrawn Date</th>
+				<th>Withdraw Amount</th>
+				<th>Withdrawn Interest</th>
+				<th>Remaining Amount</th>
+				<th>Remaining Interest</th>
+				<th>Total Due</th>
+				<th class="text-right">Actions</th>
+			</tr>
+			{% for expensea in invoicea.expensea_set.all %}
+			<tr>
+				<td>{{ expensea.description }}</td>
+				<td>{{ expensea.withdrawn_date }}AD</td>
+				<td>Rs{{ expensea.pamount }}</td>
+				<td>Rs{{ expensea.pinterest }}</td>
+				<td>Rs{{ invoicea.remaining_amount }}</td>
+				<td>Rs{{ invoicea.remaining_interest }}</td>
+				<td>Rs{{ invoicea.total_due }}</td>
+				<td class="text-right">
+					<button type="button" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#confirmdelete" data-object-name="{{ expensea.description }}" data-delete-url="{% url 'delete_invoicea_expensea' invoicea.id expensea.id %}">Delete</button>
+				</td>
+			</tr>
+			{% endfor %}
+			<tr>
+				<td><input type="text" name="description" class="form-control"></td>
+				<td>{{ expensea.withdrawn_date }}</td>
+				<td>
+					<div class="input-group"><span class="input-group-addon">Rs</span><input type="text" name="pamount" class="form-control" placeholder="0.00"></div>
+				</td>
+				<td>
+					<div class="input-group"><span class="input-group-addon">Rs</span><input type="text" name="pinterest" class="form-control" placeholder="0.00"></div>
+				</td>
+				<td>&nbsp;</td>
+				<td></td>
+				<td></td>
+				<td class="text-right">
+					<input type="submit" class="btn btn-xs btn-primary" value="Add">
+				</td>
+			</tr>
+		</table>
+		<div class="panel-footer text-right"><strong>Total: ${{ invoicea.total_expenseas }}</strong></div>
+	</div>
+</form>
+
+<div class="well text-right">Invoice net total: ${{ invoice.total }}</div>
+
+
+<!-- Delete confirmation modal -->
+<div class="modal fade" id="confirmdelete" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Confirm</h4>
+			</div>
+			<div class="modal-body">
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+				<a href="#" class="btn btn-danger">Yes</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function() {
+		$('#confirmdelete').on('show.bs.modal', function(e) {
+			var name = $(e.relatedTarget).data('object-name');
+			var url = $(e.relatedTarget).data('delete-url');
+			$('#confirmdelete .modal-body').text("Are you sure you want to delete " + name + "?");
+			$('#confirmdelete .modal-footer a').attr('href', url);
+		});
+	});
+</script>
+<!-- END delete confirmation modal -->
+
+
+
+{% if confirm_update %}
+<!-- Update success modal -->
+<div class="modal fade" id="updateconfirm" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-body">
+			<h4>Changes saved!</h4>
+        </div>
+        <div class="modal-footer">
+			<a href="#" data-dismiss="modal" class="btn btn-primary">Ok</a>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- Trigger success confirmation modal -->
+<script>
+$(document).ready(function(){
+	$("#updateconfirm").modal();
+});
+</script>
+<!-- End success confirmation modal -->
+{% endif %}
+
+<!-- End display invoice -->
+
+{% else %}
+<!-- Display invoice error -->
+
+<div class="alert alert-warning">Invoice number not found!</div>
+
+<!-- End display invoice error -->
+{% endif %}
+
+{% endblock %}
