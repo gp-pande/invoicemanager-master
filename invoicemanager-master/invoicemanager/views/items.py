@@ -12,10 +12,11 @@ from invoicemanager.models import Customer, Invoice, InvoiceItem, Expense, Invoi
 def add_item(request, invoice_id):
 	invoice = get_object_or_404(Invoice, pk=invoice_id)
 	try:
-		i = invoice.invoiceitem_set.create(name=request.POST['name'], money=request.POST['money'], weight=request.POST['weight'], ddate=request.POST['ddate'])
+		i = invoice.invoiceitem_set.create(name=request.POST['name'], money=request.POST['money'], weight=request.POST['weight'])
 		i.save()
-	except (KeyError, Invoice.DoesNotExist):
-		return render(request, 'view_invoice.html', {
+	except Exception as e:
+		print(e)
+		return render(request, 'invoice.html', {
 			'invoice': invoice,
 			'error_message': 'Not all fields were completed.',
 		})

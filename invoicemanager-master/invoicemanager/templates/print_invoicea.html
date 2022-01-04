@@ -27,19 +27,14 @@
 	{% if invoicea %}
 
 	<div class="row">
-		<div class="col-sm-4 text-left">
-			Please submit payment to:<br>
-			<address>
-			<strong>Chris Thayer</strong><br>
-			7 Oak Lane<br>
-			Cranford, NJ 07016
-			</address>
+		<div class="col-sm-2 text-left">
+
 		</div>
-		<div class="col-sm-4 text-center">
+		<div class="col- text-center">
 			<h2>Invoice {{ invoicea.id }}</h2>
 			{{ invoicea.date }}
 		</div>
-		<div class="col-sm-4 text-right">
+		<div class="col-sm-8 text-right">
 			<div class="panel panel-default">
 				<div class="panel-heading">Customer number: {{ invoicea.customera.id }}</div>
 				<div class="panel-body">

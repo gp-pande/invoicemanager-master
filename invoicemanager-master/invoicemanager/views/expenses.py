@@ -17,7 +17,7 @@ def add_invoice_expense(request, invoice_id):
 		e = invoice.expense_set.create(description=request.POST['description'], pamount=request.POST['pamount'], pinterest=request.POST['pinterest'])
 		e.save()
 	except (KeyError, Invoice.DoesNotExist):
-		return render(request, 'view_invoice.html', {
+		return render(request, 'invoice', {
 			'invoice': invoice,
 			'error_message': 'Not all fields were completed.',
 		})
